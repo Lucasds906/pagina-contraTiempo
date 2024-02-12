@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, sans-serif;
+  list-style: none;
+  text-decoration: none; }
+
+.mainIndex {
+  display: flex;
+  flex-direction: column; }
+
+.formField {
+  margin: 2rem;
+  background-color: #f1dada; }
+
+.table {
+  width: 100%;
+  margin-right: 1rem;
+  background-color: #f1dada; }
