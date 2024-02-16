@@ -15,6 +15,9 @@
   background-color: #f1dada; }
 
 .table {
-  width: 100%;
-  margin-right: 1rem;
+  width: 95%;
+  margin: auto;
   background-color: #f1dada; }
+
+.dateForm {
+  margin-left: 2rem; }
