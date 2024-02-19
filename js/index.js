@@ -26,28 +26,24 @@ class Row {
     }
 }
 
-let cliente 
-let destino  
-let solicitante  
-let unidades  
-let demora  
-let bultos  
-let lluvia 
-let fuera 
-let date
-
-let uni = 0
-let dem = 0
-let bul = 0
-let llu = 0
-let fue = 0
-let tot = 0
+let ingresosTotales = document.querySelector('.ingresosTotales')
+let ingTot = 0
 
 let fecha = document.getElementById('fecha')
 let newDate = localStorage.getItem('dateTime')
 fecha.value = newDate
 
-form.addEventListener('submit', (evt) => {
+let cliente
+let destino
+let solicitante
+let unidades
+let demora
+let bultos
+let lluvia
+let fuera
+let date
+
+form.addEventListener('submit', () => {
     cliente = form.validationServer01.value
     destino = form.validationServer02.value
     solicitante = form.validationServerUsername.value
@@ -58,30 +54,29 @@ form.addEventListener('submit', (evt) => {
     fuera = form.invalidCheck4.checked
     date = fecha.value
 
-    let nuevaFila = new Row(cliente, destino, solicitante, unidades, demora,bultos, lluvia, fuera, date)
+    let nuevaFila = new Row(cliente, destino, solicitante, unidades, demora, bultos, lluvia, fuera, date)
     formInputsArray.push(nuevaFila)
     localStorage.setItem('dateTime', date)
     localStorage.setItem('datosNuevaFila', JSON.stringify(formInputsArray))
-    // for (let i= 0; i < formInputs.length; i++) {
-    //     formInputsArray.push(formInputs[i].value)
-    //     localStorage.setItem('datosNuevaFila', JSON.stringify(formInputs[i].value))
-    // }
-    // for (input in formInputs) {
-    //     formInputsArray.push(formInputs[input].value)
-    // }
+    form.validationServer01.focus()
 })
 renderRow()
 
 let dateSubmit = document.querySelector('.dateForm')
 
-
-dateSubmit.addEventListener('submit', ()=> {
+dateSubmit.addEventListener('submit', () => {
     date = fecha.value
     localStorage.setItem('dateTime', date)
     renderRow()
 })
 
 let tableFoot = document.querySelector('.tableFoot')
+let uni = 0
+let dem = 0
+let bul = 0
+let llu = 0
+let fue = 0
+let tot = 0
 
 for (ar of arrayUnidades) {
     uni += parseFloat(ar)
@@ -98,23 +93,23 @@ for (ar of arrayBultos) {
 }
 
 for (let i = 0; i < arrayLluvia.length; i++) {
-    if (arrayLluvia[i] === true){
-        llu += parseFloat(arrayLluvia[i + 1])* .5
+    if (arrayLluvia[i] === true) {
+        llu += parseFloat(arrayLluvia[i + 1]) * .5
     }
 }
 
 for (let i = 0; i < arrayFuera.length; i++) {
-    if (arrayFuera[i] === true){
-        fue += parseFloat(arrayFuera[i + 1])* .5
+    if (arrayFuera[i] === true) {
+        fue += parseFloat(arrayFuera[i + 1]) * .5
     }
 }
 
-tot += uni*1552.50 + ((dem/60)*2328.75)
+tot += uni * 1552.50 + ((dem / 60) * 2328.75) + bul * 546.25 + llu * 1552.50 + fue * 1552.50
 
-tableFoot.innerHTML +=`
+tableFoot.innerHTML += `
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col">$${tot.toLocaleString()}</th>
+                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col">${uni}</th>
@@ -122,26 +117,46 @@ tableFoot.innerHTML +=`
                     <th scope="col">${bul}</th>
                     <th scope="col">${llu}</th>
                     <th scope="col">${fue}</th>
+                    <th scope="col">$${tot.toLocaleString()}</th>
                 </tr>
 `
 
-// function calucularTotales(variable, array) {
-//     for (ar of array) {
-//         variable += parseFloat(ar)
-//     }
-// }
-
+ingresosTotales.innerHTML += `
+<h1>Ingresos: $ ${ingTot.toLocaleString()} </h1>
+`
 function renderRow() {
     let newRow = JSON.parse(localStorage.getItem('datosNuevaFila'))
     for (let i = 0; i < newRow.length; i++) {
+        let lluviaTrue
+        let fueraTrue
+        if (newRow[i].lluvia == true) {
+            lluviaTrue = newRow[i].unidades * .5
+        } else {
+            lluviaTrue = 0
+        }
+        if (newRow[i].fuera == true) {
+            fueraTrue = newRow[i].unidades * .5
+        } else {
+            fueraTrue = 0
+        }
+        ingTot += parseFloat(newRow[i].unidades * 1552.50 + ((newRow[i].demora / 60) * 2328.75) + newRow[i].bultos * 546.25 + 1552.5 * lluviaTrue + 1552.5 * fueraTrue)
+    }
+
+    for (let i = 0; i < newRow.length; i++) {
         if (newDate == newRow[i].date) {
-            let lluviaTrue 
+            let lluviaTrue
+            let fueraTrue
             if (newRow[i].lluvia == true) {
-                lluviaTrue = 'si'
+                lluviaTrue = newRow[i].unidades * .5
             } else {
-                lluviaTrue = 'no'
+                lluviaTrue = 0
             }
-            tableContainer.innerHTML +=`
+            if (newRow[i].fuera == true) {
+                fueraTrue = newRow[i].unidades * .5
+            } else {
+                fueraTrue = 0
+            }
+            tableContainer.innerHTML += `
             <td>${++contador}</td>
             <td>${newRow[i].cliente}</td>
             <td>${newRow[i].destino}</td>
@@ -150,13 +165,9 @@ function renderRow() {
             <td>${newRow[i].demora}</td>
             <td>${newRow[i].bultos}</td>
             <td>${lluviaTrue}</td>
-            <td>${newRow[i].fuera}</td>
-            <td>${newRow[i].unidades*1552.50 + ((newRow[i].demora/60)*2328.75) + newRow[i].bultos*546.25}</td>
+            <td>${fueraTrue}</td>
+            <td>$ ${(newRow[i].unidades * 1552.50 + ((newRow[i].demora / 60) * 2328.75) + newRow[i].bultos * 546.25 + 1552.5 * lluviaTrue + 1552.5 * fueraTrue).toLocaleString()}</td>
             `
-            // if (newRow[i].lluvia) {
-
-            // }
-
             arrayUnidades.push(newRow[i].unidades)
             arrayDemora.push(newRow[i].demora)
             arrayBultos.push(newRow[i].bultos)
